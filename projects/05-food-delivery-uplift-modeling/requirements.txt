@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scikit-uplift
+causalml
+optuna
+statsmodels
+scipy
+joblib
+jupyterlab

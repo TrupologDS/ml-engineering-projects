@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+data/
+mlruns/
+mlflow_experiments_store/
+models/*.csv
+notebooks/
+.env
+.DS_Store

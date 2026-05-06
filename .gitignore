@@ -1,0 +1,74 @@
+# Environment and credentials
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+credentials.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Airflow
+**/airflow/logs/
+**/logs/
+
+# MLflow
+mlruns/
+**/mlruns/
+
+# DVC
+.dvc/cache/
+**/.dvc/cache/
+
+# Data and generated artifacts
+**/data/**
+!**/data/.gitkeep
+!**/data/**/.gitkeep
+**/models/**
+!**/models/.gitkeep
+!**/models/**/.gitkeep
+**/metrics/**
+!**/metrics/.gitkeep
+!**/metrics/**/.gitkeep
+**/cv_results/**
+!**/cv_results/.gitkeep
+!**/cv_results/**/.gitkeep
+*.csv
+*.parquet
+*.pkl
+*.joblib
+*.cbm
+*.onnx
+catboost_info/
+**/catboost_info/
+
+# Raw course exports and archives
+*.zip
+*.html
+__MACOSX/
+.DS_Store
+
+# Local configs
+.idea/
+.vscode/
+*.log

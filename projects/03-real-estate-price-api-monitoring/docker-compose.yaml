@@ -1,0 +1,54 @@
+services:
+  ml_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml_service
+    env_file:
+      - path: ./services/.env
+        required: false
+    command: >
+      uvicorn services.ml_service.price_app:app
+      --host 0.0.0.0
+      --port ${MAIN_APP_PORT:-1702}
+    ports:
+      - "${MAIN_APP_PORT_VM:-4648}:${MAIN_APP_PORT:-1702}"
+    environment:
+      - MODEL_PATH=${MODEL_PATH:-services/models/model.pkl}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    networks: [monitor-net]
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    env_file:
+      - path: ./services/.env
+        required: false
+    ports:
+      - "${PROMETHEUS_PORT_VM:-9090}:${PROMETHEUS_PORT:-9090}"
+    volumes:
+      - ./services/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks: [monitor-net]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    env_file:
+      - path: ./services/.env
+        required: false
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASS:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "${GRAFANA_PORT_VM:-3000}:${GRAFANA_PORT:-3000}"
+    volumes:
+      - ./services/grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - ml_service
+    networks: [monitor-net]
+
+networks:
+  monitor-net:
+    driver: bridge

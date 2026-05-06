@@ -1,0 +1,170 @@
+schema: '2.0'
+stages:
+  get_data:
+    cmd: python3 scripts/get_data.py
+    deps:
+    - path: scripts/get_data.py
+      hash: md5
+      md5: 98b7e70f937cbdbbf247fa68c5c0d84a
+      size: 1032
+    params:
+      params.yaml:
+        index_col: id
+    outs:
+    - path: data/initial_data.csv
+      hash: md5
+      md5: 1384c17b04eb5849b8565bd6ff1f6d84
+      size: 11549088
+      cloud:
+        yc-storage:
+          etag: 1384c17b04eb5849b8565bd6ff1f6d84
+          version_id: 000638B793640DCE
+  split_data:
+    cmd: python3 scripts/split_data.py
+    deps:
+    - path: data/initial_data.csv
+      hash: md5
+      md5: 1384c17b04eb5849b8565bd6ff1f6d84
+      size: 11549088
+    - path: scripts/split_data.py
+      hash: md5
+      md5: 04672756c64d41a538144eee188ddfcd
+      size: 838
+    params:
+      params.yaml:
+        index_col: id
+        test_size: 0.2
+    outs:
+    - path: data/test_data.csv
+      hash: md5
+      md5: 931b4065d6b1b5293a50fde1a0c80448
+      size: 2307203
+      cloud:
+        yc-storage:
+          etag: 931b4065d6b1b5293a50fde1a0c80448
+          version_id: 000638B793614CD1
+    - path: data/train_data.csv
+      hash: md5
+      md5: 86e3a0ee9ab5c08737816a73db360f79
+      size: 9236848
+      cloud:
+        yc-storage:
+          etag: 86e3a0ee9ab5c08737816a73db360f79
+          version_id: 000638B793629CF6
+  fit_model:
+    cmd: python3 scripts/fit_model.py
+    deps:
+    - path: data/train_data.csv
+      hash: md5
+      md5: 86e3a0ee9ab5c08737816a73db360f79
+      size: 9236848
+    - path: scripts/fit_model.py
+      hash: md5
+      md5: 542908d21914c82b59bb1da6bae77c42
+      size: 1636
+    params:
+      params.yaml:
+        train.catboost:
+          iterations: 1000
+          learning_rate: 0.05
+          depth: 6
+          random_seed: 42
+        train.drop_cols:
+        - id
+        - building_id
+        - flat_id
+        train.preprocess:
+          num_cols:
+          - build_year
+          - latitude
+          - longitude
+          - ceiling_height
+          - flats_count
+          - floors_total
+          - floor
+          - kitchen_area
+          - living_area
+          - total_area
+          cat_cols:
+          - building_type_int
+          - has_elevator
+          - rooms
+          - is_apartment
+          - studio
+        train.target_col: price
+    outs:
+    - path: models/catboost_pipe.pkl
+      hash: md5
+      md5: d94b9bcb7663cc17bed22d126a9640dc
+      size: 1123888
+  evaluate_model:
+    cmd: python3 scripts/evaluate_model.py
+    deps:
+    - path: data/test_data.csv
+      hash: md5
+      md5: 931b4065d6b1b5293a50fde1a0c80448
+      size: 2307203
+    - path: models/catboost_pipe.pkl
+      hash: md5
+      md5: d94b9bcb7663cc17bed22d126a9640dc
+      size: 1123888
+    - path: scripts/evaluate_model.py
+      hash: md5
+      md5: 59a0e274e76b3d30c4cba3543b93f75e
+      size: 2752
+    params:
+      params.yaml:
+        evaluate:
+          target_col: price
+          drop_cols:
+          - id
+          - building_id
+          - flat_id
+          cv:
+            n_splits: 5
+            shuffle: true
+            random_state: 42
+          metrics:
+          - neg_mean_absolute_error
+          - neg_root_mean_squared_error
+          - r2
+        train.catboost:
+          iterations: 1000
+          learning_rate: 0.05
+          depth: 6
+          random_seed: 42
+        train.preprocess:
+          num_cols:
+          - build_year
+          - latitude
+          - longitude
+          - ceiling_height
+          - flats_count
+          - floors_total
+          - floor
+          - kitchen_area
+          - living_area
+          - total_area
+          cat_cols:
+          - building_type_int
+          - has_elevator
+          - rooms
+          - is_apartment
+          - studio
+    outs:
+    - path: cv_results/cv_results.json
+      hash: md5
+      md5: a0f321123f283a76d626fbef142feff6
+      size: 531
+      cloud:
+        yc-storage:
+          etag: a0f321123f283a76d626fbef142feff6
+          version_id: 000638C966A8D87F
+    - path: metrics/test_metrics.json
+      hash: md5
+      md5: ba3ef86a9acf1b371d5b738fa127c1af
+      size: 95
+      cloud:
+        yc-storage:
+          etag: ba3ef86a9acf1b371d5b738fa127c1af
+          version_id: 000638C966A93678

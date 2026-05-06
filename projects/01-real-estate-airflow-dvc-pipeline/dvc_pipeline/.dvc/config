@@ -1,0 +1,6 @@
+[core]
+    remote = public-placeholder
+['remote "public-placeholder"']
+    url = s3://<your-bucket>/dvc
+    endpointurl = https://<your-s3-endpoint>
+    region = <your-region>

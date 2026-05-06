@@ -1,0 +1,45 @@
+stages:
+  get_data:
+    cmd: python3 scripts/get_data.py
+    deps:
+    - scripts/get_data.py
+    params:
+    - index_col
+    outs:
+    - data/initial_data.csv
+  split_data:
+    cmd: python3 scripts/split_data.py
+    deps:
+    - data/initial_data.csv
+    - scripts/split_data.py
+    params:
+    - index_col
+    - test_size
+    outs:
+    - data/test_data.csv
+    - data/train_data.csv
+  fit_model:
+    cmd: python3 scripts/fit_model.py
+    deps:
+    - data/train_data.csv
+    - scripts/fit_model.py
+    params:
+    - train.catboost
+    - train.drop_cols
+    - train.preprocess
+    - train.target_col
+    outs:
+    - models/catboost_pipe.pkl
+  evaluate_model:
+    cmd: python3 scripts/evaluate_model.py
+    deps:
+    - data/test_data.csv
+    - models/catboost_pipe.pkl
+    - scripts/evaluate_model.py
+    params:
+    - evaluate
+    - train.catboost
+    - train.preprocess
+    outs:
+    - cv_results/cv_results.json
+    - metrics/test_metrics.json

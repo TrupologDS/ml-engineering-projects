@@ -1,0 +1,22 @@
+services:
+  events:
+    image: python:3.10-slim
+    working_dir: /app
+    command: bash -lc "pip install fastapi uvicorn && uvicorn services.events_service:app --host 0.0.0.0 --port 8020"
+    volumes:
+      - ./services:/app/services
+    ports: ["8020:8020"]
+
+  features:
+    image: python:3.10-slim
+    working_dir: /app
+    command: bash -lc "pip install fastapi uvicorn pandas pyarrow && uvicorn services.features_service:app --host 0.0.0.0 --port 8010"
+    volumes:
+      - ./services:/app/services
+      - ./models:/app/models
+    ports: ["8010:8010"]
+
+  recommendations:
+    build: .
+    depends_on: [features, events]
+    ports: ["8000:8000"]

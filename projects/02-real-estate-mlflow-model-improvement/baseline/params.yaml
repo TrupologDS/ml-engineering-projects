@@ -1,0 +1,51 @@
+# Public English comment.
+index_col: id        
+test_size: 0.2       
+
+train:
+  target_col: price          
+  drop_cols:                 
+    - id
+    - building_id
+    - flat_id
+
+  preprocess:                
+    num_cols:                
+      - build_year
+      - latitude
+      - longitude
+      - ceiling_height
+      - flats_count
+      - floors_total
+      - floor
+      - kitchen_area
+      - living_area
+      - total_area
+    cat_cols:                
+      - building_type_int
+      - has_elevator
+      - rooms
+      - is_apartment
+      - studio
+
+  catboost:                  
+    iterations: 1000
+    learning_rate: 0.05
+    depth: 6
+    random_seed: 42
+
+# Public English comment.
+evaluate:
+  target_col: price          
+  drop_cols:                 
+    - id
+    - building_id
+    - flat_id
+  cv:                        
+    n_splits: 5
+    shuffle: true
+    random_state: 42
+  metrics:                   
+    - neg_mean_absolute_error
+    - neg_root_mean_squared_error
+    - r2
