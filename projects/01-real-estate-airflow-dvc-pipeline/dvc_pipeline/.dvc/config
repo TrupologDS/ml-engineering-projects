@@ -1,6 +1,6 @@
 [core]
-    remote = public-placeholder
-['remote "public-placeholder"']
-    url = s3://<your-bucket>/dvc
-    endpointurl = https://<your-s3-endpoint>
-    region = <your-region>
+    remote = public_remote
+[remote "public_remote"]
+    url = s3://example-bucket/dvc
+    endpointurl = https://example-s3-endpoint.invalid
+    region = example-region
